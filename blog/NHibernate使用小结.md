@@ -182,4 +182,4 @@ public class GradeService
 
 ```
 
-#####6. 
+这样第一个使用NHibernate的小实例就完成了。
