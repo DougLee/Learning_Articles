@@ -29,6 +29,16 @@ import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7
 ### Emmet
 Sublime Text的Zen Coding插件。
 
+用法：
+
+1. 首先 Ctrl + Shift + P，输入sshtml，设置页面为html格式
+2. 输入html标签，如 html ，然后按tab键即可。
+3. 几种常用的Zen Coding写法：
+
+### HTML-CSS-JS Prettify
+格式还html css和js代码。
+默认快捷键：**Ctrl + Shift + H**。或者右键选择“HTML/CSS/JS Prettify” -> "Prettify Code"
+
 ### OmniMarkupPreviewer
 刚开始使用，可以在浏览器中预览Markdown格式（Ctrl + Alt + O），可以导出到HTML格式，更多功能还在摸索。
 
@@ -36,3 +46,4 @@ Sublime Text的Zen Coding插件。
 
 Ctrl + B: build python代码
 Ctrl + /: 注释代码
+Ctrl + Shift + H：格式化html/css/js代码
