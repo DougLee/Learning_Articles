@@ -31,7 +31,7 @@ StringBuffer和StringBuilder都可变, 区别在于StringBuilder是线程不安�
 实际上StringBuilder是在JDK 1.5中才加上的, 之前只有StringBuffer, 写过几年C#的我很是怀疑StringBuilder的这个命名是从C#借鉴来的. 至于为什么先有一个线程安全的StringBuffer后来再有一个线程不安全的StringBuilder, 而且从两者的命名来看你压根区分不出哪个是线程安全的, 个人感觉这应该是一个设计失误吧...
 
 StringBuffer和StringBuilder都继承自AbstractStringBuilder, 而AbstractStringBuilder里有个expandCapacity方法用来扩容, 这就导致了StringBuffer和StringBuilder中另外一个重要的问题, 就是初始化时的容量问题.
-### 扩容的问题
+### StringBuilder扩容的问题
 
 在StringBuilder中有一个char[], 初始的容量是16. 那么问题来了, 如果要append的长度超过了16, 会发生什么?
 
@@ -49,6 +49,4 @@ void expandCapacity(int minimumCapacity) {
     value = Arrays.copyOf(value, newCapacity);
 }
 ```
-初始长度太小扩容时会带来时间消耗, 初始长度太大优惠带来空间消耗, 如何给StringBUilder设置一个合适的初始长度呢?
-
-## 应用场景
+初始长度太小扩容时会带来时间消耗, 初始长度太大又会带来空间消耗. 可以参考[这里](http://www.voidcn.com/blog/FX_SKY/article/p-6302561.html)的用法来复用StringBuilder.
