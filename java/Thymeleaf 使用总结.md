@@ -49,6 +49,16 @@
 
 #### URL表达式
 
+```html
+<a href="main.html" th:href="@{/main}"/>
+```
+
+可以支持设置参数和相对路径
+
+**@{/order/details(id=${orderId})} **
+
+**@{../documents/report}**
+
 ### 常用th标签
 
 | 关键字  | 功能介绍 | 例子   |
@@ -57,7 +67,33 @@
 
 
 
-## 使用Thymeleaf布局
+## 使用Thymeleaf模板布局
+
+### 定义和引用模板
+
+在Thymeleaf中可以使用**th:fragment**属性来定义一个模板
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<div th:fragment="footer" th:class="footer">
+    2018 &copy;
+</div>
+</html>
+```
+
+上面定义了一个叫做**footer**的模板, 可以通过**th:include**或者**th:replace**属性来使用它.
+
+```html
+<div th:include="fragments/footer :: footer"></div>
+<div th:replace="fragments/footer :: footer"></div>
+```
+
+> th:include和th:replace的区别: include只是加载, replace是替换.
+
+比如上面两个最终渲染的效果, th:replace会包含class="footer"这个属性, 而th:include则没有包含这个属性.
+
+## Others
 
 
 
