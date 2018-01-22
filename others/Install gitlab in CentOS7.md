@@ -81,6 +81,26 @@ sudo vi /var/opt/gitlab/gitlab-rails/etc/gitlab.yml
 
 至此gitlab已经安装配置完成.  执行`gitlab-ctl reconfigure` 然后访问之前配置的http:ip即可.
 
+> 注: 安装完成后访问页面有一定概率出现 502 错误，刷新浏览器或者再次更新配置即可.
+
+## GitLab 备份
+
+### 创建备份
+
+```bash
+gitlab-rake gitlab:backup:create
+```
+
+上述命令会在`/var/opt/gitlab/backups/`路径下创建一个名称类似`1516330234_2018_01_19_version_gitlab_backup.tar`的备份文件. 这个文件包含GitLab所有数据(账号信息, 分组信息以及仓库等等).
+
+### 从备份恢复
+
+
+
+### 修改备份路径
+
+
+
 ##常用的Gitlab命令
 
 ```bash
@@ -94,6 +114,10 @@ sudo gitlab-ctl status
 sudo gitlab-ctl stop
 # 查看gitlab日志
 sudo gitlab-ctl tail
+
+# 查看版本
+gitlab-rake gitlab:env:info
+# 或者访问 http://192.168.105.122/help页面
 ```
 
 ## 安装中遇到的问题
@@ -107,6 +131,12 @@ ONBOOT=yes
 ```
 
 然后重启网络服务`systemctl restart network` 即可.
+
+2. 使用API创建账号 创建好的账号都需要再确认
+
+> 在链接中添加`confirm=false` 即可.
+
+
 
 ## References
 
