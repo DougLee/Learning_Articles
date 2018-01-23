@@ -49,6 +49,8 @@ sudo yum makecache
 sudo yum install gitlab-ce
 ```
 
+gitlab的命令工具会在`/opt/gitlab/bin/`路径下.
+
 执行安装的过程有点慢, 需要稍微耐心等待一下.
 
 ## 配置GitLab
@@ -79,7 +81,7 @@ sudo vi /var/opt/gitlab/gitlab-rails/etc/gitlab.yml
 
 如果没有找到gitlab.yml文件, 需要执行 `gitlab-ctl reconfigure` 命令, 之后再去执行路径下找gitlab.yml文件
 
-至此gitlab已经安装配置完成.  执行`gitlab-ctl reconfigure` 然后访问之前配置的http:ip即可.
+至此gitlab已经安装配置完成.  执行`gitlab-ctl reconfigure`  gitlab-ctl restart然后访问之前配置的http:ip即可.
 
 > 注: 安装完成后访问页面有一定概率出现 502 错误，刷新浏览器或者再次更新配置即可.
 
@@ -95,9 +97,59 @@ gitlab-rake gitlab:backup:create
 
 ### 从备份恢复
 
+#### backups目录只有一个备份文件时
 
+```bash
+sudo gitlab-rake gitlab:backup:restore
+```
+
+#### 从指定时间戳的备份文件恢复
+
+```bash
+sudo gitlab-rake gitlab:backup:restore BACKUP=1516330234
+```
 
 ### 修改备份路径
+
+修改`/etc/gitlab/gitlab.rb`文件中的
+
+```bash
+gitlab['backup_path'] = 'new path'
+```
+
+然后重新生成一下gitlab的配置
+
+```
+gitlab-ctl reconfigure
+```
+
+### 定时备份
+
+```bash
+#添加任务
+crontab -e
+
+#每天5点备份gitlab数据
+0 5 * * * /opt/gitlab/bin/gitlab-rake gitlab:backup:create
+```
+
+添加crontab定时任务之后需要重启crontab服务
+
+```bash
+sudo /sbin/service crond reload
+sudo /sbin/service crond restart
+
+# 查看crontab服务状态
+service crond status
+```
+
+
+
+设置只保留最近7天的备份, 修改/etc/gitlab/gitlab.rb文件中的如下配置
+
+```bash
+gitlab_rails['backup_keep_time'] = 604800
+```
 
 
 
