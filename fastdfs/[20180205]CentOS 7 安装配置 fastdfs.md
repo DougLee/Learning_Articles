@@ -316,6 +316,90 @@ netstat -antlp | grep fdfs
 
 如图 ![](images/storage测试.png) 表示启动成功. 
 
+### 在storage上配置nginx
+
+fastdfs-nginx-module模块只需要安装在storage上.
+
+#### 安装nginx
+
+```bash
+./configure --add-module=../fastdfs-nginx-module-master/src/ --prefix=/usr/local/nginx
+make && make install
+
+```
+
+#### 配置fastdfs-nginx-module
+
+```bash
+cd /data/fastdfs-nginx-module-master/src
+cp mod_fastdfs.conf /etc/fdfs
+vi mod_fastdfs.conf
+```
+
+修改mod_fastdfs.conf中的一下几个参数
+
+```config
+base_path=/root/fastdfs           #保存日志目录
+tracker_server=192.168.53.85:22122
+tracker_server=192.168.53.86:22122 
+storage_server_port=23000         #storage服务器的端口号
+group_name=group1                 #当前服务器的group名
+url_have_group_name = true        #文件url中是否有group名
+store_path_count=1                #存储路径个数，需要和store_path个数匹配
+store_path0=/root/fastdfs         #存储路径
+group_count = 2 
+```
+
+在mod_fastdfs.conf文件末尾增加组的具体信息:
+
+```config
+[group1]
+group_name=group1
+storage_server_port=23000
+store_path_count=1
+store_path0=/root/fastdfs
+
+[group2]
+group_name=group2
+storage_server_port=23000
+store_path_count=1
+store_path0=/root/fastdfs
+```
+
+#### 建立M00到存储目录的符号链接
+
+```bash
+ln -s /data/fastdfs/storage/data /data/fastdfs/storage/data/M00
+ll /data/fastdfs/storage/data/M00
+```
+
+#### 配置nginx
+
+```bash
+vi /usr/local/nginx/conf/nginx.conf
+```
+
+修改nginx.conf在server中添加
+
+```bash
+location ~/group[1-2]/M00 {
+    root /root/fastdfs/data;
+    ngx_fastdfs_module;
+}
+```
+
+#### 复制fastdfs中的http.conf, mime.types文件到/etc/fdfs
+
+```bash
+cd /data/fastdfs-5.11
+
+cp http.conf /etc/fdfs
+cp mime.types /etc/fdfs
+cp anti-steal.jpg /etc/fdfs
+```
+
+
+
 ### 在tracker上配置nginx
 
 在tracker上安装的nginx主要是为了提供http访问的反向代理, 负载均衡以及缓存服务.
@@ -328,9 +412,72 @@ cd /data/nginx-1.10.1
 make && make install 
 ```
 
+修改nginx.conf的配置
 
+```bash
+http {
+    #设置group1的服务器
+    upstream fdfs_group1 {
+        server 192.168.53.90:8080 weight=1 max_fails=2 fail_timeout=30s;
+        server 192.168.54.229:8080 weight=1 max_fails=2 fail_timeout=30s;
+    }
+    #设置group2的服务器
+    upstream fdfs_group2 {
+        server 192.168.54.233:8080 weight=1 max_fails=2 fail_timeout=30s;
+        server 192.168.54.234:8080 weight=1 max_fails=2 fail_timeout=30s;
+    }
 
-### 在storage上配置nginx
+   server {
+       #设置服务器端口
+        listen       8080;
+       #设置group1的负载均衡参数
+        location /group1/M00 {
+            proxy_pass http://fdfs_group1;
+        }
+        #设置group2的负载均衡参数
+        location /group2/M00 {
+            proxy_pass http://fdfs_group2;
+        }
+      }
+
+    }
+```
+
+至此nginx设置完成
+
+### 上传文件测试
+
+#### 启动tracker storage nginx
+
+```bash
+/usr/local/nginx/sbin/nginx
+service fdfs_trackerd start
+service fdfs_storaged start
+```
+
+#### 修改client.conf
+
+```bash
+cd /etc/fdfs
+cp client.conf.sample client.conf
+vi client.conf
+```
+
+修改以下参数
+
+```bash
+base_path=/data/fastdfs/
+tracker_server=192.168.107.241:22122
+http.tracker_server_port=80
+```
+
+#### 上传文件
+
+```bash
+fdfs_test /etc/fdfs/client.conf upload filename
+# 或者
+/usr/bin/fdfs_upload_file /etc/fdfs/client.conf t.jpg 
+```
 
 
 
