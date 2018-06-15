@@ -244,43 +244,93 @@ fdfs_test /etc/fdfs/client.conf upload filename
 
 ## 集群环境部署
 
-### Tracker 服务器
+### 安装FastDFS(全部)
 
-需要安装FastDFS和Nginx, 这里的nginx是为了对外提供文件下载接口, 起到负载均衡的作用. tracker的nginx代理会转发至storage上的nginx
-
-1. 安装FastDFS
-   同单机版
-2. 配置Tracker服务器
-   同单机版
-3. 安装Nginx
-   不需配置nginx插件, 其余同单机版
+分别安装libfastcommon-1.0.36和fastdfs-5.11
 
 ```bash
-firewall-cmd --permanent --zone=public --add-port=80/tcp
-firewall-cmd --permanent --zone=public --add-port=22122/tcp
-systemctl restart firewalld
+cd libfastcommon-1.0.36
+./make && ./make install
+cd ../fastdfs-5.11
+./make && ./make install
+```
+
+### 配置tracker
+
+```bash
+cd /etc/fdfs
+cp tracker.conf.sample tracker.conf
+```
+
+修改tracker.conf中的两个配置, 其中base_path必须在启动tracker之前创建好文件路径
+
+```config
+base_path=/data/fastdfs/tracker
+http.server_port=80
+```
+
+修改完成之后可以测试下tracker
+
+```bash
+service fdfs_trackerd start
+netstat -anp | grep fdfs
+```
+
+如果结果是![tracker启动测试](images/tracker测试.png)
+
+则表示tracker已经启动成功.
+
+也可以查看tracker日志看看tracker是否已经启动成功
+
+```bash
+vi /data/fastdfs/tracker/logs/trackerd.log
 ```
 
 
 
-### Storage服务器
+### 配置Storage
 
-需要安装FastDFS和Nginx, 这里的nginx和tracker上的nginx有区别, storage上的nginx需要安装FastDFS-nginx模块, 此模块的作用是将FastDFS和nginx进行整合, nginx对外提供http文件下载接口
+修改base_path store_path0和tracker_server三个配置, 其中路径需要提前建好
 
-1. 安装FastDFS
-   同单机版
-2. 配置Storage服务器
-   同单机版
-3. 安装Nginx
-   同单机版
+```xml
+base_path=/data/fastdfs/storage
+store_path0=/data/fastdfs/storage
+tracker_server=192.168.107.241:22122
+```
+
+修改配置完成后用如下命令启动Storage服务器
 
 ```bash
-firewall-cmd --permanent --zone=public --add-port=80/tcp
-firewall-cmd --permanent --zone=public --add-port=23000/tcp
-systemctl restart firewalld
+/usr/bin/fdfs_storaged /etc/fdfs/storage.conf
+# 或者
+service fdfs_storaged start
+```
+
+启动完成之后依然使用
+
+```bash
+netstat -antlp | grep fdfs
+```
+
+来查看storage服务器是否启动成功.
+
+如图 ![](images/storage测试.png) 表示启动成功. 
+
+### 在tracker上配置nginx
+
+在tracker上安装的nginx主要是为了提供http访问的反向代理, 负载均衡以及缓存服务.
+
+```bash
+cd /data/nginx-1.10.1
+# 设置安装路径
+./configure --prefix=/usr/local/nginx
+
+make && make install 
 ```
 
 
+
+### 在storage上配置nginx
 
 
 
