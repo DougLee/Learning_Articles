@@ -69,7 +69,7 @@ http.server_port=80
 或者
 
 ```bash
-service trackerd start/stop/restart
+service fdfs_trackerd start/stop/restart
 ```
 
 启动完成之后如果没有报错可以查看下端口监听来判断Tracker服务是否正确启动
@@ -111,6 +111,20 @@ netstat -antlp | grep fdfs
 ```
 
 来查看storage服务器是否启动成功.
+
+### 配置Nginx 及Nginx插件
+
+可以使用fdfs_monitor检查fdfs的服务是否配置成功
+
+```bash
+service fdfs_trackerd start
+service fdfs_storaged start
+fdfs_monitor /etc/storage.conf
+# 或者
+fdfs_monitor /etc/client.conf
+```
+
+
 
 ###  配置Nginx 及Nginx插件
 
