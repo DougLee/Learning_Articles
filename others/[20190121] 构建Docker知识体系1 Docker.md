@@ -50,7 +50,27 @@ Docker名称=name+tag
 
 ###容器命令
 
+Ctrl + q + p: 退出容器但是不停止
 
+
+
+
+
+
+
+镜像介绍:
+
+什么是镜像
+
+
+
+
+
+Docker数据卷
+
+
+
+Dockfile
 
 
 
