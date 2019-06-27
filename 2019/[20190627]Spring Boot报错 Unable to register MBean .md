@@ -18,3 +18,6 @@ spring.jmx.default-domain: some-name # 取一个自己项目的不重复的名�
 spring.jmx.enabled: false
 ```
 
+## 参考链接
+1. https://stackoverflow.com/questions/27440985/unable-to-register-mbean-hikaridatasource-hikaripool-0-with-key-datasource
+2. https://github.com/jhipster/generator-jhipster/issues/874
