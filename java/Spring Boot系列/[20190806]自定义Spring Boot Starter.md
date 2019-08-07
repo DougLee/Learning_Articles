@@ -10,7 +10,10 @@ Spring Boot集成一些第三方库, 基于"约定优于配置"的原则, 简化
 
 ## Spring Boot Starter的原理
 
-
++ spring boot 在启动的时候会扫描项目所以来的jar包, 寻找包含spring.factories文件的jar包
++ 找到后会读取spring.factories文件获取配置的自动配置类XXAtutoConfiguration
++ 然后会将自动配置类满足条件(@ConditionalOnXXX的Bean放到Spring容器中
++ 使用者可以直接用来注入, 因为该类已经在spring容器中了.
 
 ## 自定义Spring Boot Starter
 
